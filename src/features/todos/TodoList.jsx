@@ -1,18 +1,28 @@
-import { useSelector } from "react-redux";
-import TodoItem from "./TodoItem";
+// import { useSelector } from "react-redux";
+// import TodoItem from "./TodoItem";
 
-import { useGetTodo } from "../todos/todoApi";
+import {
+  useGetTodosQuery,
+  useDeleteTodoMutation,
+  useChangesCheckTodoMutation,
+} from "../todos/todoApi";
 
 const TodoList = () => {
-  const todos = useSelector((state) => state.todos.todos);
-  const { data, error, isLoading } = useGetTodo();
+  // const todos = useSelector((state) => state.todos.todos);
+  const { data, error, isLoading } = useGetTodosQuery();
+  const [deleteTodo] = useDeleteTodoMutation();
+  const [changeCheck] = useChangesCheckTodoMutation();
+
+  const handleChange = (data) => {
+    changeCheck(data);
+  };
 
   return (
     <div>
       <ul>
-        {todos.map((todo) => (
+        {/* {todos.map((todo) => (
           <TodoItem key={todo.id} {...todo} />
-        ))}
+        ))} */}
         {error ? (
           <>error</>
         ) : isLoading ? (
@@ -21,9 +31,22 @@ const TodoList = () => {
           <ul>
             {data.map((todo) => (
               <li key={todo.id}>
-                <input type="checkbox" checked={todo.complete} />
+                <input
+                  type="checkbox"
+                  checked={todo.complete || ""}
+                  onChange={() => {
+                    handleChange(todo);
+                  }}
+                />
                 <span>{todo.title}</span>
-                <span className="del-todo">&times;</span>
+                <span
+                  className="del-todo"
+                  onClick={() => {
+                    deleteTodo(todo.id);
+                  }}
+                >
+                  &times;
+                </span>
               </li>
             ))}
           </ul>
